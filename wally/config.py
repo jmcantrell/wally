@@ -20,10 +20,10 @@ class Config(SingleConfig):
                     })
 
     def _get_background_color(self):
-        return color.hex_to_rgb(self.get('main', 'background_color', '#000000'))
+        return color.hex_to_rgb(self.get('app:main', 'background_color', '#000000'))
 
     def _set_background_color(self, value):
-        self.set('main', 'background_color', color.rgb_to_hex(value))
+        self.set('app:main', 'background_color', color.rgb_to_hex(value))
 
     background_color = property(_get_background_color, _set_background_color)
 
@@ -41,9 +41,9 @@ class Config(SingleConfig):
     directories = property(_get_directories, _set_directories)
 
     def _get_exclusions(self):
-        return self.getlist('main', 'exclusions')
+        return self.getlist('app:main', 'exclusions')
 
     def _set_exclusions(self, exclusions):
-        self.set('main', 'exclusions', exclusions)
+        self.set('app:main', 'exclusions', exclusions)
 
     exclusions = property(_get_exclusions, _set_exclusions)
