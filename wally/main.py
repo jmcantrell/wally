@@ -8,15 +8,13 @@ from . import config, utils
 
 class Wally(object): #{{{1
 
-    def __init__(self, types=None, directories=None):
+    def __init__(self):
         self.clear_exclusions()
         self.clear_searches()
         self.changer = gnomeutils.Background()
         self.monitors = self.changer.get_monitors()
         self.screen_image = None
         self.config = config.Config()
-        self.directories = directories or self.config.directories
-        if types: self.directories = dict((t, self.directories[t]) for t in types)
         self.cache = Cache(os.path.join(self.config.directory, 'cache'))
         self.add_exclusions(self.config.exclusions)
         self._load_wallpaper()
@@ -37,7 +35,7 @@ class Wally(object): #{{{1
         self.wallpapers_all = []
         for n, wt in enumerate(WALLPAPER_TYPES):
             if len(self.monitors) < 2 and wt == 'multi': continue
-            directories = self.directories.get(wt)
+            directories = self.config.directories.get(wt)
             if not directories: continue
             wallpapers = self.find_wallpapers(directories)
             if not wallpapers: continue
