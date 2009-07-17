@@ -30,8 +30,7 @@ class Config(SingleConfig):
     def _get_directories(self):
         dirs = {}
         for wt in self.options('directories'):
-            dirs[wt] = [os.path.expanduser(d)
-                    for d in self.getlist('directories', wt)]
+            dirs[wt] = [pathutils.expand(d) for d in self.getlist('directories', wt)]
         return dirs
 
     def _set_directories(self, directories):

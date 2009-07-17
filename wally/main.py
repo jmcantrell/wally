@@ -3,18 +3,20 @@ import gnomeutils, imageutils, imageutils.compose
 from scriptutils.cache import Cache
 from PIL import Image
 
-from . import WALLPAPER_TYPES
+from . import WALLPAPER_TYPES, WALLPAPER_ACTIONS
 from . import config, utils
 
 class Wally(object): #{{{1
 
-    def __init__(self):
+    def __init__(self, types=None, directories=None):
         self.clear_exclusions()
         self.clear_searches()
         self.changer = gnomeutils.Background()
         self.monitors = self.changer.get_monitors()
         self.screen_image = None
         self.config = config.Config()
+        self.directories = directories or self.config.directories
+        if types: self.directories = dict((t, self.directories[t]) for t in types)
         self.cache = Cache(os.path.join(self.config.directory, 'cache'))
         self.add_exclusions(self.config.exclusions)
         self._load_wallpaper()
@@ -35,7 +37,7 @@ class Wally(object): #{{{1
         self.wallpapers_all = []
         for n, wt in enumerate(WALLPAPER_TYPES):
             if len(self.monitors) < 2 and wt == 'multi': continue
-            directories = self.config.directories.get(wt)
+            directories = self.directories.get(wt)
             if not directories: continue
             wallpapers = self.find_wallpapers(directories)
             if not wallpapers: continue
@@ -176,13 +178,7 @@ class Wally(object): #{{{1
             self.screen_image = base
 
     def set_wallpaper(self, w, monitor):
-        paster = {
-                'scale': imageutils.compose.paste_scale,
-                'zoom': imageutils.compose.paste_zoom,
-                'stretch': imageutils.compose.paste_stretch,
-                'center': imageutils.compose.paste_center,
-                'tile': imageutils.compose.paste_tile,
-                }[WALLPAPER_TYPES[w[0]]]
+        paster = getattr(imageutils.compose, 'paste_%s' % WALLPAPER_TYPES[w[0]])
         base = self.base_image(monitor[0:2])
         if os.path.isfile(w[1]):
             self.screen_image.paste(
