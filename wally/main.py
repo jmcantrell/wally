@@ -3,7 +3,7 @@ import gnomeutils, imageutils, imageutils.compose
 from scriptutils.cache import Cache
 from PIL import Image
 
-from . import WALLPAPER_TYPES, WALLPAPER_ACTIONS
+from . import WALLPAPER_TYPES, WALLPAPER_COMMANDS
 from . import config, utils
 
 class Wally(object): #{{{1

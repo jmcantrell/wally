@@ -101,7 +101,7 @@ __date__    = 'Tue 2008-02-05 14:55:05 (-0500)'
 __license__ = 'GPL'
 
 WALLPAPER_TYPES = ['scale', 'multi', 'tile', 'stretch', 'zoom', 'center']
-WALLPAPER_ACTIONS = ['random', 'next', 'prev', 'multi']
+WALLPAPER_COMMANDS = ['random', 'next', 'prev', 'multi']
 
 from .main import Wally
 from .gui import main as main_gui
