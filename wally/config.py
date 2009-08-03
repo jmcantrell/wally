@@ -30,7 +30,7 @@ class Config(SingleConfig):
     def _get_directories(self):
         dirs = {}
         for wt in self.options('directories'):
-            dirs[wt] = [pathutils.expand(d) for d in self.getlist('directories', wt)]
+            dirs[wt] = [pathutils.expand(d) for d in self.getlist('directories', wt, [])]
         return dirs
 
     def _set_directories(self, directories):
@@ -40,7 +40,7 @@ class Config(SingleConfig):
     directories = property(_get_directories, _set_directories)
 
     def _get_exclusions(self):
-        return self.getlist('app:main', 'exclusions')
+        return self.getlist('app:main', 'exclusions', [])
 
     def _set_exclusions(self, exclusions):
         self.set('app:main', 'exclusions', exclusions)

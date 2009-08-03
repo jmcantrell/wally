@@ -5,7 +5,7 @@ from glob import glob
 
 setup(
         name='Wally',
-        version='0.3.13',
+        version='0.3.14',
         description='Tool for managing desktop backgrounds.',
         author='Jeremy Cantrell',
         author_email='jmcantrell@gmail.com',
