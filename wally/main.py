@@ -22,7 +22,8 @@ class Wally(object): #{{{1
 
     def _load_wallpaper(self):
         monitor_count = len(self.monitors)
-        self.wallpaper_key = 'wallpaper-%s' % monitor_count
+        screen_size = '%sx%s' % self.changer.get_screen_size()
+        self.wallpaper_key = 'wallpaper-%s' % screen_size
         self.wallpaper_file = '%s.png' % self.wallpaper_key
         w = [None] * monitor_count
         prev_w = self.cache[self.wallpaper_key]
@@ -107,8 +108,7 @@ class Wally(object): #{{{1
     def valid_wallpaper(self, w):
         if self.exclusions and utils.matches_any(w, self.exclusions):
             return False
-        if self.searches:
-            if utils.matches_any(w, self.searches): return True
+        if self.searches and not utils.matches_all(w, self.searches):
             return False
         return True
 

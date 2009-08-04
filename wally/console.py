@@ -16,17 +16,17 @@ def get_options(): #{{{1
             choices=WALLPAPER_COMMANDS)
     opts.add_option('-r', '--refresh', help='Refresh the display.',
             default=False, action='store_true')
-    opts.add_option('-s', '--search', metavar='REGEX',
+    opts.add_option('-s', '--search', metavar='REGEX', action='append',
             help='Search filenames based on REGEX.')
-    opts.add_option('-x', '--exclude', metavar='REGEX',
+    opts.add_option('-x', '--exclude', metavar='REGEX', action='append',
             help='Exclude filenames based on REGEX.')
     return opts.parse_args()
 
 def main(): #{{{1
     opts, args = get_options()
     w = Wally()
-    if opts.search: w.add_search(opts.search)
-    if opts.exclude: w.add_exclusion(opts.exclude)
+    if opts.search: w.set_searches(opts.search)
+    if opts.exclude: w.set_exclusions(opts.exclude)
     w.refresh_wallpapers()
     if opts.command: getattr(w, 'change_%s' % opts.command)(opts.target)
     if opts.verbose: print '\n'.join(w[1] for w in w.wallpaper)

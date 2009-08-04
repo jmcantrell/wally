@@ -11,7 +11,7 @@ class Config(SingleConfig):
         SingleConfig.__init__(self,
                 filename=os.path.join(
                     os.path.expanduser('~/.%s' % __appname__.lower()),
-                    'config.cfg'
+                    'main.cfg'
                     ),
                 base={
                     'directories': {

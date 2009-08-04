@@ -8,6 +8,12 @@ def matches_any(x, patterns): #{{{1
         if p.search(x): return True
     return False
 
+def matches_all(x, patterns): #{{{1
+    """Test whether 'x' matches all patterns in 'patterns'"""
+    for p in patterns:
+        if not p.search(x): return False
+    return True
+
 def split_list(l, delim): #{{{1
     tokens = []
     acc = []
