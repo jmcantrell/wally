@@ -20,6 +20,9 @@ def get_options(): #{{{1
             help='Search filenames based on REGEX.')
     opts.add_option('-x', '--exclude', metavar='REGEX', action='append',
             help='Exclude filenames based on REGEX.')
+    opts.add_option('--exclude-type', metavar='TYPE', action='append',
+            help='Wallpaper type to exclude.', type='choice',
+            choices=WALLPAPER_TYPES)
     return opts.parse_args()
 
 def main(): #{{{1
@@ -27,6 +30,7 @@ def main(): #{{{1
     w = Wally()
     if opts.search: w.set_searches(opts.search)
     if opts.exclude: w.set_exclusions(opts.exclude)
+    if opts.exclude_type: w.set_excluded_types(opts.exclude_type)
     w.refresh_wallpapers()
     if opts.command: getattr(w, 'change_%s' % opts.command)(opts.target)
     if opts.verbose: print '\n'.join(w[1] for w in w.wallpaper)

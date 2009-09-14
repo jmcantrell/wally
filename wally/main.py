@@ -9,8 +9,10 @@ from . import config, utils
 class Wally(object): #{{{1
 
     def __init__(self):
-        self.clear_exclusions()
         self.clear_searches()
+        self.clear_exclusions()
+        self.clear_excluded_types()
+        self.excluded_types = []
         self.changer = gnomeutils.Background()
         self.monitors = self.changer.get_monitors()
         self.screen_image = None
@@ -46,7 +48,7 @@ class Wally(object): #{{{1
 
     def refresh_wallpapers(self):
         self.wallpapers = [w for w in self.wallpapers_all
-                if self.valid_wallpaper(w[1])]
+                if self.valid_wallpaper(w)]
 
     def get_wallpapers(self, types=None):
         if not types: types = range(len(WALLPAPER_TYPES))
@@ -65,17 +67,24 @@ class Wally(object): #{{{1
     def clear_searches(self):
         self.searches = []
 
-    def clear_exclusions(self):
-        self.exclusions = []
-
     def add_search(self, pattern):
         self.searches.append(re.compile(pattern, re.I))
 
-    def add_exclusion(self, pattern):
-        self.exclusions.append(re.compile(pattern, re.I))
-
     def add_searches(self, patterns):
         for p in patterns: self.add_search(p)
+
+    def set_searches(self, patterns):
+        self.clear_searches()
+        self.add_searches(patterns)
+
+    def get_searches(self):
+        return [r.pattern for r in self.searches]
+
+    def clear_exclusions(self):
+        self.exclusions = []
+
+    def add_exclusion(self, pattern):
+        self.exclusions.append(re.compile(pattern, re.I))
 
     def add_exclusions(self, patterns):
         for p in patterns: self.add_exclusion(p)
@@ -87,12 +96,21 @@ class Wally(object): #{{{1
     def get_exclusions(self):
         return [r.pattern for r in self.exclusions]
 
-    def set_searches(self, patterns):
-        self.clear_searches()
-        self.add_searches(patterns)
+    def clear_excluded_types(self):
+        self.excluded_types = []
 
-    def get_searches(self):
-        return [r.pattern for r in self.searches]
+    def add_excluded_type(self, t):
+        self.excluded_types.append(WALLPAPER_TYPES.index(t))
+
+    def add_excluded_types(self, types):
+        for t in types: self.add_excluded_type(t)
+
+    def set_excluded_types(self, types):
+        self.clear_excluded_types()
+        self.add_excluded_types(types)
+
+    def get_excluded_types(self):
+        return [WALLPAPER_TYPES[t] for t in self.excluded_types]
 
     def find_wallpapers(self, directories):
         wallpapers = []
@@ -106,9 +124,11 @@ class Wally(object): #{{{1
         return random.choice(pool)
 
     def valid_wallpaper(self, w):
-        if self.exclusions and utils.matches_any(w, self.exclusions):
+        if w[0] in self.excluded_types:
             return False
-        if self.searches and not utils.matches_all(w, self.searches):
+        if self.exclusions and utils.matches_any(w[1], self.exclusions):
+            return False
+        if self.searches and not utils.matches_all(w[1], self.searches):
             return False
         return True
 
