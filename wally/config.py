@@ -14,9 +14,13 @@ class Config(SingleConfig):
                     'main.cfg'
                     ),
                 base={
+                    'app:main': {
+                        'background_color': '#000000',
+                        'exclusions': [],
+                        },
                     'directories': {
-                        'scale': '/usr/share/backgrounds',
-                        }
+                        'scale': ['/usr/share/backgrounds'],
+                        },
                     })
 
     def _get_background_color(self):
