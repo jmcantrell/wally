@@ -30,4 +30,3 @@ def md5sum(value): #{{{1
     md5 = hashlib.md5()
     md5.update(value)
     return md5.hexdigest()
-

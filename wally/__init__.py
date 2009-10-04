@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
 # Description {{{1
-"""Tool for managing desktop backgrounds.
+
+"""Tool for managing desktop wallpapers.
 
 Wally was created because desktop environments in Linux lack the ability to
-set backgrounds on a per-monitor basis. This is mainly due to the fact that
+set wallpapers on a per-monitor basis. This is mainly due to the fact that
 multi-display setups in X are seen as a single screen. For example, two
 1600x1200 monitors would actually be a 3200x1200 screen in a side-by-side
 configuration. Currently, Wally only supports Gnome. I would like to add
 support for KDE, but I have no need for it right now.
 
-The only assumptions that Wally makes about your collection of backgrounds is
+The only assumptions that Wally makes about your collection of wallpapers is
 that they are organized into a central folder for each type of operation. The
-only operation that most people want is 'scale', which resizes the background
+only operation that most people want is 'scale', which resizes the wallpaper
 while keeping the same aspect ratio. The following resizing operations are
 supported:
 
@@ -26,42 +27,38 @@ supported:
 The configuration file will be created on the first invocation, and will be
 located at:
 
-    ~/.wally/config
+    ~/.wally/main.cfg
 
-You'll want to specify where to look for backgrounds. This is done with one or
+You'll want to specify where to look for wallpapers. This is done with one or
 more of the following options (multiple directories are comma-separated):
 
-    directories_scale
-    directories_multi
-    directories_tile
-    directories_zoom
-    directories_center
-    directories_stretch
+    [directories]
+    scale
+    multi
+    tile
+    zoom
+    center
+    stretch
 
 Example:
+    scale = /usr/share/backgrounds, ~/wallpapers/scale
+    multi = ~/wallpapers/multi
 
-    directories_scale = /usr/share/backgrounds, ~/backgrounds/scale
-    directories_multi = ~/backgrounds/multi
-
-You may not want all of your backgrounds to be considered when choosing a new
-one. You can set this with the following option (values are regular expressions
-and are comma-separated):
-
-    exclusion_patterns
+You may not want all of your wallpapers to be considered when choosing a new
+one. You can set this with the 'exclusions' option (values are regular
+expressions and are comma-separated):
 
 Example:
-
-    exclusion_patterns = .*\.png, /some/folder/to/exlude, partial/path, /nsfw/
+    [app:main]
+    exclusions = .*\.png, /some/folder/to/exlude, partial/path, /nsfw/
 
 In the instances where the image does not cover the entire monitor, the color
-black will be used as the background. You can change this with the following
-option (specified as a three color RGB value):
-
-    background_color
+black will be used as the wallpaper. You can change this with the
+'background_color' option (specified as a hex triplet):
 
 Example:
-
-    background_color = 139, 0, 139
+    [app:main]
+    background_color = #000000
 
 Wally can be invoked directly at the command line, but it is often easier to
 create launchers to execute common commands. To see available options, run the
@@ -72,25 +69,19 @@ following command at the command line:
 Some examples of typical usage:
 
     See the current status:
-
         wally -v
 
-    Choose a background at random from all sources:
-
+    Choose a wallpaper at random from all sources:
         wally -c random
 
-    Choose the next background for display 0 (primary):
-
+    Choose the next wallpaper for display 0 (primary):
         wally -t0 -c next
 
-    Choose a random background for display 1 that matches the pattern 'fractal'
-    or 'family photos':
-
+    Random wallpaper for display 1 that matches the pattern 'fractal' or
+    'family photos':
         wally -t1 -c random fractal "family photos"
 
-    Choose a random background that matches 'family photos', but without
-    'Jeremy':
-
+    Random wallpaper that matches 'family photos', but without 'Jeremy':
         wally -c rantom 'family photos' - 'jeremy'
 """ #}}}
 

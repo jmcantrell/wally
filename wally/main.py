@@ -19,10 +19,10 @@ class Wally(object): #{{{1
         self.config = config.Config()
         self.cache = Cache(os.path.join(self.config.directory, 'cache'))
         self.add_exclusions(self.config.exclusions)
-        self._load_wallpaper()
-        self._load_wallpapers()
+        self.load_wallpaper()
+        self.load_wallpapers()
 
-    def _load_wallpaper(self):
+    def load_wallpaper(self):
         monitor_count = len(self.monitors)
         screen_size = '%sx%s' % self.changer.get_screen_size()
         self.wallpaper_key = 'wallpaper-%s' % screen_size
@@ -34,7 +34,7 @@ class Wally(object): #{{{1
             for n in range(len(w)): w[n] = prev_w[n]
         self.wallpaper = w
 
-    def _load_wallpapers(self):
+    def load_wallpapers(self):
         self.wallpapers_all = []
         for n, wt in enumerate(WALLPAPER_TYPES):
             if len(self.monitors) < 2 and wt == 'multi': continue
@@ -199,8 +199,6 @@ class Wally(object): #{{{1
         paster = getattr(imageutils.compose, 'paste_%s' % WALLPAPER_TYPES[w[0]])
         base = self.base_image(monitor[0:2])
         if os.path.isfile(w[1]):
-            self.screen_image.paste(
-                    paster(base, Image.open(w[1])), monitor[2:4])
+            self.screen_image.paste(paster(base, Image.open(w[1])), monitor[2:4])
         else:
             self.screen_image.paste(base, monitor[2:4])
-
