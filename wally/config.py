@@ -1,6 +1,6 @@
 import os
 import pathutils
-from imageutils import color
+from imageutils.color import hex_to_rgb, rgb_to_hex
 from scriptutils.config import SingleConfig
 
 from . import __appname__
@@ -24,10 +24,10 @@ class Config(SingleConfig):
                     })
 
     def _get_background_color(self):
-        return color.hex_to_rgb(self.get('app:main', 'background_color', '#000000'))
+        return hex_to_rgb(self.get('app:main', 'background_color', '#000000'))
 
     def _set_background_color(self, value):
-        self.set('app:main', 'background_color', color.rgb_to_hex(value))
+        self.set('app:main', 'background_color', rgb_to_hex(value))
 
     background_color = property(_get_background_color, _set_background_color)
 

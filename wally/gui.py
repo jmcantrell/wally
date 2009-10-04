@@ -1,4 +1,4 @@
-import os.path, tempfile
+import os.path
 import pygtk; pygtk.require('2.0')
 import gtk
 import pathutils, gnomeutils, gtkutils, imageutils.color
@@ -8,6 +8,7 @@ from . import Wally, WALLPAPER_TYPES, utils
 from . import __appname__, __author__, __url__, __license__
 
 # FUNCTIONS {{{1
+
 def get_resource(name): #{{{2
     return resource_filename(
             Requirement.parse(__appname__),
@@ -22,6 +23,7 @@ def main(): #{{{2
     gtk.main()
 
 # CLASSES {{{1
+
 class AboutDialog(gtk.AboutDialog): #{{{2
 
     def __init__(self, *args, **kwargs):

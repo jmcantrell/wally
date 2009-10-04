@@ -32,7 +32,6 @@ located at:
 You'll want to specify where to look for wallpapers. This is done with one or
 more of the following options (multiple directories are comma-separated):
 
-    [directories]
     scale
     multi
     tile
@@ -51,7 +50,6 @@ expressions and are comma-separated):
 
 Example:
 
-    [app:main]
     exclusions = .*\.png, /some/folder/to/exlude, partial/path, /nsfw/
 
 In the instances where the image does not cover the entire monitor, the color
@@ -60,7 +58,6 @@ black will be used as the wallpaper. You can change this with the
 
 Example:
 
-    [app:main]
     background_color = #000000
 
 Wally can be invoked directly at the command line, but it is often easier to
@@ -86,6 +83,7 @@ Some examples of typical usage:
 
     Random wallpaper that matches 'family photos', but without 'Jeremy':
         wally -c rantom 'family photos' - 'jeremy'
+
 """ #}}}
 
 __appname__ = 'Wally'

@@ -20,11 +20,11 @@ setup(
             'Topic :: Desktop Environment :: Gnome',
             ],
         install_requires=[
-            'ScriptUtils>=0.5',
-            'GNOMEUtils>=0.1.5',
-            'GTKUtils>=0.1.3',
-            'ImageUtils>=0.1.1',
-            'PathUtils>=0.6',
+            'ScriptUtils',
+            'GNOMEUtils',
+            'GTKUtils',
+            'ImageUtils',
+            'PathUtils',
             ],
         entry_points={
             'console_scripts': [
