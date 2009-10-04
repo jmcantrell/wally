@@ -5,7 +5,7 @@ import pathutils, gnomeutils, gtkutils, imageutils.color
 from pkg_resources import Requirement, resource_filename
 
 from . import Wally, WALLPAPER_TYPES, utils
-from . import __appname__, __authors__, __url__, __license__
+from . import __appname__, __author__, __url__, __license__
 
 # FUNCTIONS {{{1
 def get_resource(name): #{{{2
@@ -27,7 +27,7 @@ class AboutDialog(gtk.AboutDialog): #{{{2
     def __init__(self, *args, **kwargs):
         gtk.AboutDialog.__init__(self, *args, **kwargs)
         self.set_name(__appname__)
-        self.set_authors(__authors__)
+        self.set_authors([__author__])
         self.set_website(__url__)
         self.set_license(__license__)
         self.set_logo(gtkutils.pixbuf_from_file(get_icon('logo.svg'), (100, 100)))

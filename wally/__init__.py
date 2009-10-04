@@ -41,6 +41,7 @@ more of the following options (multiple directories are comma-separated):
     stretch
 
 Example:
+
     scale = /usr/share/backgrounds, ~/wallpapers/scale
     multi = ~/wallpapers/multi
 
@@ -49,6 +50,7 @@ one. You can set this with the 'exclusions' option (values are regular
 expressions and are comma-separated):
 
 Example:
+
     [app:main]
     exclusions = .*\.png, /some/folder/to/exlude, partial/path, /nsfw/
 
@@ -57,6 +59,7 @@ black will be used as the wallpaper. You can change this with the
 'background_color' option (specified as a hex triplet):
 
 Example:
+
     [app:main]
     background_color = #000000
 
@@ -86,8 +89,8 @@ Some examples of typical usage:
 """ #}}}
 
 __appname__ = 'Wally'
-__authors__ = ['Jeremy Cantrell <jmcantrell@gmail.com>']
-__url__     = 'http://jeremycantrell.com'
+__author__  = 'Jeremy Cantrell <jmcantrell@gmail.com>'
+__url__     = 'http://jmcantrell.me'
 __date__    = 'Tue 2008-02-05 14:55:05 (-0500)'
 __license__ = 'GPL'
 
