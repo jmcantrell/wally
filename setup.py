@@ -10,7 +10,7 @@ setup(
         author='Jeremy Cantrell',
         author_email='jmcantrell@gmail.com',
         classifiers=[
-            'Development Status :: 3 - Alpha',
+            'Development Status :: 4 - Beta',
             'Environment :: X11 Applications :: Gnome',
             'Intended Audience :: End Users/Desktop',
             'License :: OSI Approved :: GNU General Public License (GPL)',
