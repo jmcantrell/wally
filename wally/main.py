@@ -10,11 +10,6 @@ from .config import Config
 from .utils import matches_any, matches_all
 from . import ASPECT_RATIOS
 
-
-def display_type(aspect_ratio):
-    return ASPECT_RATIOS.get(aspect_ratio, 'standard')
-
-
 class Wally(object): #{{{1
 
     def __init__(self):
@@ -65,7 +60,8 @@ class Wally(object): #{{{1
     exclusions = property(_get_exclusions, _set_exclusions, _del_exclusions)
 
     def load_display(self):
-        self.display_type = display_type(aspect_ratio(self.changer.get_screen_size()))
+        self.aspect_ratio = aspect_ratio(self.changer.get_screen_size())
+        self.display_type = ASPECT_RATIOS.get(self.aspect_ratio, 'standard')
         self.display_key = 'display-%s' % self.display_type
         self.display = [None] * len(self.monitors)
         dp = self.cache.get(self.display_key, [])
@@ -97,7 +93,7 @@ class Wally(object): #{{{1
 
     def valid_wallpaper(self, wallpaper):
         if self.exclusions and matches_any(wallpaper, self.exclusion_patterns): return False
-        if self.searches and not matches_all(wallpaper, self.searche_patterns): return False
+        if self.searches and not matches_all(wallpaper, self.search_patterns): return False
         return True
 
     def change_random(self, target=None):
