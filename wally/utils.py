@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os, hashlib
 
 def matches_any(x, patterns): #{{{1
@@ -30,3 +28,15 @@ def md5sum(value): #{{{1
     md5 = hashlib.md5()
     md5.update(value)
     return md5.hexdigest()
+
+def uniqify(seq, key=None): #{{{1
+    if key is None:
+        def key(x): return x
+    seen = {}
+    result = []
+    for item in seq:
+        marker = key(item)
+        if marker not in seen:
+            seen[marker] = 1
+            result.append(item)
+    return result

@@ -1,10 +1,16 @@
 import os.path
-import pygtk; pygtk.require('2.0')
-import gtk
-import pathutils, gnomeutils, gtkutils, imageutils.color
+import gtk, pygtk; pygtk.require('2.0')
 from pkg_resources import Requirement, resource_filename
 
-from . import Wally, WALLPAPER_TYPES, utils
+from imageutils.color import rgb8_to_rgb16, rgb16_to_rgb8
+from pathutils import condense
+from gnomeutils import Thumbnails
+from gtkutils import pixbuf_from_file, get_icon_list
+from gtkutils import StandardDialog, DirectoryChooser
+from gtkutils.treeview import text_column
+
+from .main import Wally
+from . import WALLPAPER_TYPES
 from . import __appname__, __author__, __url__, __license__
 
 # FUNCTIONS {{{1
@@ -32,7 +38,7 @@ class AboutDialog(gtk.AboutDialog): #{{{2
         self.set_authors([__author__])
         self.set_website(__url__)
         self.set_license(__license__)
-        self.set_logo(gtkutils.pixbuf_from_file(get_icon('logo.svg'), (100, 100)))
+        self.set_logo(pixbuf_from_file(get_icon('logo.svg'), (100, 100)))
 
     def run(self):
         gtk.AboutDialog.run(self)
@@ -40,17 +46,17 @@ class AboutDialog(gtk.AboutDialog): #{{{2
 
 
 
-class ExclusionsDialog(gtkutils.StandardDialog): #{{{2
+class ExclusionsDialog(StandardDialog): #{{{2
 
     COL_EX = 0
 
     def __init__(self, exclusions, *args, **kwargs):
-        gtkutils.StandardDialog.__init__(self, *args, **kwargs)
+        super(ExclusionsDialog, self).__init__(*args, **kwargs)
         self.set_title('Exclusions')
         self.set_default_size(400, 300)
         self.treeview = gtk.TreeView(gtk.ListStore(str))
         self.treeview.set_headers_visible(False)
-        self.treeview.append_column(gtkutils.treeview.text_column('Exclusion', self.COL_EX))
+        self.treeview.append_column(text_column('Exclusion', self.COL_EX))
         self.treeview.connect('cursor-changed', self.on_treeview_cursor_changed)
         scrolled = gtk.ScrolledWindow()
         scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -121,10 +127,10 @@ class BackgroundColorDialog(gtk.ColorSelectionDialog): #{{{2
 
 
 
-class DirectoriesDialog(gtkutils.StandardDialog): #{{{2
+class DirectoriesDialog(StandardDialog): #{{{2
 
     def __init__(self, directories, *args, **kwargs):
-        gtkutils.StandardDialog.__init__(self, *args, **kwargs)
+        super(DirectoriesDialog, self).__init__(*args, **kwargs)
         self.set_title('Directories')
         self.notebook = gtk.Notebook()
         self.vbox.add(self.notebook)
@@ -158,7 +164,7 @@ class DirectoriesPage(gtk.Frame): #{{{2
         gtk.Frame.__init__(self)
         self.treeview = gtk.TreeView(gtk.ListStore(str))
         self.treeview.set_headers_visible(False)
-        self.treeview.append_column(gtkutils.treeview.text_column('Directory', self.COL_DIR))
+        self.treeview.append_column(text_column('Directory', self.COL_DIR))
         self.treeview.connect('cursor-changed', self.on_treeview_cursor_changed)
         scrolled = gtk.ScrolledWindow()
         scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -179,7 +185,7 @@ class DirectoriesPage(gtk.Frame): #{{{2
         self.set_directories(directories)
 
     def add_directory(self, directory):
-        self.treeview.get_model().append([pathutils.condense(directory)])
+        self.treeview.get_model().append([condense(directory)])
 
     def set_directories(self, directories):
         self.treeview.get_model().clear()
@@ -190,7 +196,7 @@ class DirectoriesPage(gtk.Frame): #{{{2
         return [os.path.expanduser(row[self.COL_DIR]) for row in model]
 
     def on_add_button_clicked(self, widget):
-        directory = gtkutils.DirectoryChooser().run()
+        directory = DirectoryChooser().run()
         if not directory: return
         self.add_directory(directory)
 
@@ -237,7 +243,7 @@ class MainWindow(gtk.Window): #{{{2
 
     def __init__(self, app):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        self.set_icon_list(*gtkutils.get_icon_list(get_icon('logo.svg')))
+        self.set_icon_list(*get_icon_list(get_icon('logo.svg')))
         self.set_default_size(600, 500)
         self.app = app
         self.set_title(__appname__)
@@ -245,13 +251,13 @@ class MainWindow(gtk.Window): #{{{2
         self.show_all()
 
     def refresh_wallpapers(self, query=None):
-        self.app.wally.clear_searches()
-        if query: self.app.wally.set_searches([query])
+        del(self.app.wally.searches)
+        if query: self.app.wally.searches = [query]
         self.app.wally.refresh_wallpapers()
-        wallpapers = [p[1] for p in sorted(
-            ((os.path.getmtime(w[1]), w) for w in self.app.wally.wallpapers),
+        wallpapers = sorted(
+            ((os.path.getmtime(w), w) for w in self.app.wally.wallpapers),
             reverse=True
-            )][:int(self.search_limit.get_value())]
+            )[:int(self.search_limit.get_value())]
         self.wallpaper_view.set_wallpapers(wallpapers)
         self.update_wallpaper_count(len(wallpapers))
 
@@ -379,7 +385,7 @@ class MainWindow(gtk.Window): #{{{2
     def on_selected_menuitem_activate(self, menuitem, target): #{{{4
         w = self.wallpaper_view.get_selected()
         if target is None: target = 0
-        self.app.wally.wallpaper[target] = w
+        self.app.wally.display[target] = w
         self.app.wally.refresh_display()
 
     def on_random_menuitem_activate(self, menuitem, target): #{{{4
@@ -412,12 +418,11 @@ class MainWindow(gtk.Window): #{{{2
         self.app.wally.config.write()
 
     def on_color_menuitem_activate(self, widget): #{{{4
-        color = imageutils.color.rgb8_to_rgb16(self.app.wally.config.background_color)
+        color = rgb8_to_rgb16(self.app.wally.config.background_color)
         color = BackgroundColorDialog(gtk.gdk.Color(*color)).run()
         if not color: return
-        self.app.wally.config.background_color = imageutils.color.rgb16_to_rgb8(
-                (color.red, color.green, color.blue))
-        self.app.wally.save_config()
+        self.app.wally.config.background_color = rgb16_to_rgb8((color.red, color.green, color.blue))
+        self.app.wally.config.write()
 
     def on_about_menuitem_activate(self, widget): #{{{4
         AboutDialog().run()
@@ -439,7 +444,7 @@ class WallyGTK(object): #{{{2
 
     def __init__(self):
         self.wally = Wally()
-        self.thumbs = gnomeutils.Thumbnails()
+        self.thumbs = Thumbnails()
         self.window = MainWindow(self)
         self.window.connect('destroy', gtk.main_quit)
 

@@ -1,204 +1,145 @@
 import os, re, random
-import gnomeutils, imageutils, imageutils.compose
+import gnomeutils
 from scriptutils.cache import Cache
+from imageutils import find_images
+from imageutils.size import aspect_ratio
+from imageutils.compose import paste_scale
 from PIL import Image
 
-from . import WALLPAPER_TYPES, WALLPAPER_COMMANDS
-from . import config, utils
+from .config import Config
+from .utils import matches_any, matches_all
+from . import ASPECT_RATIOS
+
+
+def display_type(aspect_ratio):
+    return ASPECT_RATIOS.get(aspect_ratio, 'standard')
+
 
 class Wally(object): #{{{1
 
     def __init__(self):
-        self.clear_searches()
-        self.clear_exclusions()
-        self.clear_excluded_types()
-        self.excluded_types = []
         self.changer = gnomeutils.Background()
         self.monitors = self.changer.get_monitors()
-        self.screen_image = None
-        self.config = config.Config()
+        self.config = Config()
         self.cache = Cache(os.path.join(self.config.directory, 'cache'))
+        del(self.searches)
+        del(self.exclusions)
         self.add_exclusions(self.config.exclusions)
-        self.load_wallpaper()
+        self.load_display()
         self.load_wallpapers()
 
-    def load_wallpaper(self):
-        monitor_count = len(self.monitors)
-        screen_size = '%sx%s' % self.changer.get_screen_size()
-        self.wallpaper_key = 'wallpaper-%s' % screen_size
-        self.wallpaper_file = '%s.png' % self.wallpaper_key
-        w = [None] * monitor_count
-        prev_w = self.cache[self.wallpaper_key]
-        if prev_w:
-            prev_w.extend(w)  # just to ensure there is enough wiggle room
-            for n in range(len(w)): w[n] = prev_w[n]
-        self.wallpaper = w
+    def add_search(self, pattern):
+        self.search_patterns.append(re.compile(pattern, re.I))
+
+    def add_searches(self, patterns):
+        for pattern in patterns: self.add_search(pattern)
+
+    def _get_searches(self):
+        return [r.pattern for r in self.search_patterns]
+
+    def _set_searches(self, patterns):
+        del(self.searches)
+        self.add_searches(patterns)
+
+    def _del_searches(self):
+        self.search_patterns = []
+
+    searches = property(_get_searches, _set_searches, _del_searches)
+
+    def add_exclusion(self, pattern):
+        self.exclusion_patterns.append(re.compile(pattern, re.I))
+
+    def add_exclusions(self, patterns):
+        for pattern in patterns: self.add_exclusion(pattern)
+
+    def _get_exclusions(self):
+        return [r.pattern for r in self.exclusion_patterns]
+
+    def _set_exclusions(self, patterns):
+        del(self.exclusions)
+        self.add_exclusions(patterns)
+
+    def _del_exclusions(self):
+        self.exclusion_patterns = []
+
+    exclusions = property(_get_exclusions, _set_exclusions, _del_exclusions)
+
+    def load_display(self):
+        self.display_type = display_type(aspect_ratio(self.changer.get_screen_size()))
+        self.display_key = 'display-%s' % self.display_type
+        self.display = [None] * len(self.monitors)
+        dp = self.cache.get(self.display_key, [])
+        for n in range(len(self.display)):
+            try:
+                self.display[n] = dp[n]
+            except IndexError:
+                self.display[n] = None
 
     def load_wallpapers(self):
         self.wallpapers_all = []
-        for n, wt in enumerate(WALLPAPER_TYPES):
-            if len(self.monitors) < 2 and wt == 'multi': continue
-            directories = self.config.directories.get(wt)
-            if not directories: continue
-            wallpapers = self.find_wallpapers(directories)
-            if not wallpapers: continue
-            self.wallpapers_all.extend([(n, f) for f in wallpapers])
+        for d in self.config.directories.get(self.display_type, []):
+            self.wallpapers_all.extend(find_images(d))
         self.wallpapers_all.sort()
         self.refresh_wallpapers()
 
     def refresh_wallpapers(self):
-        self.wallpapers = [w for w in self.wallpapers_all
-                if self.valid_wallpaper(w)]
+        self.wallpapers = [w for w in self.wallpapers_all if self.valid_wallpaper(w)]
 
-    def get_wallpapers(self, types=None):
-        if not types: types = range(len(WALLPAPER_TYPES))
-        return [w for w in self.wallpapers if w[0] in types]
+    def dump_display(self):
+        if any(self.display): self.cache[self.display_key] = self.display
+        fn = os.path.join(self.config.directory, '%s.png' % self.display_key)
+        self.display_image.save(fn)
+        self.changer.set_background(fn)
+        self.cache.dump()
 
-    def dump_wallpaper(self):
-        if any(self.wallpaper):
-            self.cache[self.wallpaper_key] = self.wallpaper
-        w_file = os.path.join(self.config.directory, self.wallpaper_file)
-        self.screen_image.save(w_file)
-        self.changer.set_background(w_file)
-
-    def base_image(self, size):
+    def image(self, size):
         return Image.new('RGB', size, self.config.background_color)
 
-    def clear_searches(self):
-        self.searches = []
-
-    def add_search(self, pattern):
-        self.searches.append(re.compile(pattern, re.I))
-
-    def add_searches(self, patterns):
-        for p in patterns: self.add_search(p)
-
-    def set_searches(self, patterns):
-        self.clear_searches()
-        self.add_searches(patterns)
-
-    def get_searches(self):
-        return [r.pattern for r in self.searches]
-
-    def clear_exclusions(self):
-        self.exclusions = []
-
-    def add_exclusion(self, pattern):
-        self.exclusions.append(re.compile(pattern, re.I))
-
-    def add_exclusions(self, patterns):
-        for p in patterns: self.add_exclusion(p)
-
-    def set_exclusions(self, patterns):
-        self.clear_exclusions()
-        self.add_exclusions(patterns)
-
-    def get_exclusions(self):
-        return [r.pattern for r in self.exclusions]
-
-    def clear_excluded_types(self):
-        self.excluded_types = []
-
-    def add_excluded_type(self, t):
-        self.excluded_types.append(WALLPAPER_TYPES.index(t))
-
-    def add_excluded_types(self, types):
-        for t in types: self.add_excluded_type(t)
-
-    def set_excluded_types(self, types):
-        self.clear_excluded_types()
-        self.add_excluded_types(types)
-
-    def get_excluded_types(self):
-        return [WALLPAPER_TYPES[t] for t in self.excluded_types]
-
-    def find_wallpapers(self, directories):
-        wallpapers = []
-        for directory in directories:
-            wallpapers.extend(imageutils.find_images(directory))
-        return wallpapers
-
-    def get_random_wallpaper(self, types=None):
-        pool = self.get_wallpapers(types)
-        if not pool: return None
-        return random.choice(pool)
-
-    def valid_wallpaper(self, w):
-        if w[0] in self.excluded_types:
-            return False
-        if self.exclusions and utils.matches_any(w[1], self.exclusions):
-            return False
-        if self.searches and not utils.matches_all(w[1], self.searches):
-            return False
+    def valid_wallpaper(self, wallpaper):
+        if self.exclusions and matches_any(wallpaper, self.exclusion_patterns): return False
+        if self.searches and not matches_all(wallpaper, self.searche_patterns): return False
         return True
+
+    def change_random(self, target=None):
+        for n in range(len(self.display)):
+            if target is not None and target != n: continue
+            self.display[n] = random.choice(self.wallpapers)
+
+    def refresh_display(self):
+        self.display_image = self.image(self.changer.get_screen_size())
+        for n, monitor in enumerate(self.monitors):
+            self.set_wallpaper(self.display[n], monitor)
+        self.dump_display()
+
+    def set_wallpaper(self, wallpaper, monitor):
+        base = self.image(monitor[0:2])
+        if wallpaper and os.path.isfile(wallpaper):
+            self.display_image.paste(paste_scale(base, Image.open(wallpaper)), monitor[2:4])
+        else:
+            self.display_image.paste(base, monitor[2:4])
 
     def increment(self, count, target=None):
         if count == 0: return
-        wall_count = len(self.wallpapers)
-        if abs(count) > wall_count: return
-        next_idx = (-1 if count > 0 else wall_count) + count
+        total = len(self.wallpapers)
+        count %= total
+        next_idx = (-1 if count > 0 else total) + count
         for n, m in enumerate(self.monitors):
             if target is not None and target != n: continue
-            w = self.wallpaper[n]
-            if not w:
-                w = self.wallpapers[next_idx]
+            wallpaper = self.display[n]
+            if not wallpaper:
+                wallpaper = self.wallpapers[next_idx]
                 next_idx += count / abs(count)
             else:
-                if w in self.wallpapers:
-                    idx = self.wallpapers.index(w) + count
+                if wallpaper in self.wallpapers:
+                    idx = self.wallpapers.index(wallpaper) + count
                 else:
                     idx = 0 if count > 0 else -1
-                if idx >= wall_count: idx -= wall_count
-                w = self.wallpapers[idx]
-            self.wallpaper[n] = w
-
-    def change_random(self, target=None):
-        types = range(len(WALLPAPER_TYPES))
-        if target is not None:
-            types.remove(WALLPAPER_TYPES.index('multi'))
-        for n, m in enumerate(self.monitors):
-            if target is not None and target != n: continue
-            w = self.get_random_wallpaper(types)
-            if not w: break
-            if WALLPAPER_TYPES[w[0]] == 'multi':
-                self.wallpaper = [w]
-                break
-            self.wallpaper[n] = w
+                if idx >= total: idx -= total
+                wallpaper = self.wallpapers[idx]
+            self.display[n] = wallpaper
 
     def change_next(self, target=None):
         self.increment(1, target)
 
     def change_prev(self, target=None):
         self.increment(-1, target)
-
-    def change_multi(self, target=None):
-        if len(self.monitors) < 2: return
-        types = [WALLPAPER_TYPES.index('multi')]
-        w = self.get_random_wallpaper(types)
-        self.set_wallpaper_multi(w)
-
-    def refresh_display(self):
-        self.screen_image = self.base_image(self.changer.get_screen_size())
-        for n, m in enumerate(self.monitors):
-            w = self.wallpaper[n]
-            if not w: continue
-            if WALLPAPER_TYPES[w[0]] == 'multi':
-                self.set_wallpaper_multi(w[1])
-                break
-            self.set_wallpaper(w, m)
-        self.dump_wallpaper()
-
-    def set_wallpaper_multi(self, w):
-        base = self.base_image(self.changer.get_screen_size())
-        if os.path.isfile(w):
-            self.screen_image = imageutils.compose.paste_scale(base, Image.open(w))
-        else:
-            self.screen_image = base
-
-    def set_wallpaper(self, w, monitor):
-        paster = getattr(imageutils.compose, 'paste_%s' % WALLPAPER_TYPES[w[0]])
-        base = self.base_image(monitor[0:2])
-        if os.path.isfile(w[1]):
-            self.screen_image.paste(paster(base, Image.open(w[1])), monitor[2:4])
-        else:
-            self.screen_image.paste(base, monitor[2:4])

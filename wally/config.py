@@ -19,7 +19,7 @@ class Config(SingleConfig):
                         'exclusions': [],
                         },
                     'directories': {
-                        'scale': ['/usr/share/backgrounds'],
+                        'standard': ['/usr/share/backgrounds'],
                         },
                     })
 

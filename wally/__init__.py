@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Description {{{1
 
 """Tool for managing desktop wallpapers.
@@ -92,9 +90,14 @@ __url__     = 'http://jmcantrell.me'
 __date__    = 'Tue 2008-02-05 14:55:05 (-0500)'
 __license__ = 'GPL'
 
-WALLPAPER_TYPES = ['scale', 'multi', 'tile', 'stretch', 'zoom', 'center']
-WALLPAPER_COMMANDS = ['random', 'next', 'prev', 'multi']
+from .utils import uniqify
 
-from .main import Wally
-from .gui import main as main_gui
-from .console import main as main_console
+ASPECT_RATIOS = {
+        (128, 75): 'netbook',
+        (4, 3): 'standard',
+        (8, 5): 'widescreen',
+        }
+
+WALLPAPER_TYPES = uniqify(ASPECT_RATIOS.values())
+
+WALLPAPER_COMMANDS = ['random', 'next', 'prev']

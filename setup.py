@@ -5,7 +5,7 @@ from glob import glob
 
 setup(
         name='Wally',
-        version='0.5',
+        version='0.6',
         description='Tool for managing desktop backgrounds.',
         author='Jeremy Cantrell',
         author_email='jmcantrell@gmail.com',
@@ -28,10 +28,10 @@ setup(
             ],
         entry_points={
             'console_scripts': [
-                'wally=wally:main_console',
+                'wally=wally.console:main',
                 ],
             'gui_scripts': [
-                'wally-gui=wally:main_gui',
+                'wally-gui=wally.gui:main',
                 ],
             },
         packages=[
