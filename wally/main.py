@@ -10,7 +10,21 @@ from .config import Config
 from .utils import matches_any, matches_all
 from . import ASPECT_RATIOS
 
-class Wally(object): #{{{1
+# FUNCTIONS {{{1
+
+def find_wallpapers(directories): #{{{2
+    wallpapers = []
+    for d in directories:
+        wallpapers.extend(find_images(d))
+    return wallpapers
+
+def display_type(monitor): #{{{2
+    return ASPECT_RATIOS.get(aspect_ratio(monitor[0:2]), 'standard')
+
+
+# CLASSES {{{1
+
+class Wally(object): #{{{2
 
     def __init__(self):
         self.changer = gnomeutils.Background()
@@ -60,30 +74,29 @@ class Wally(object): #{{{1
     exclusions = property(_get_exclusions, _set_exclusions, _del_exclusions)
 
     def load_display(self):
-        self.aspect_ratio = aspect_ratio(self.changer.get_screen_size())
-        self.display_type = ASPECT_RATIOS.get(self.aspect_ratio, 'standard')
-        self.display_key = 'display-%s' % self.display_type
         self.display = [None] * len(self.monitors)
-        dp = self.cache.get(self.display_key, [])
-        for n in range(len(self.display)):
-            try:
-                self.display[n] = dp[n]
-            except IndexError:
-                self.display[n] = None
+        self.display_key = [None] * len(self.monitors)
+        self.display_type = [None] * len(self.monitors)
+        for n, monitor in enumerate(self.monitors):
+            self.display_type[n] = display_type(monitor)
+            self.display_key[n] = 'display-%s-%s' % (n, self.display_type[n])
+            self.display[n] = self.cache.get(self.display_key[n])
 
     def load_wallpapers(self):
-        self.wallpapers_all = []
-        for d in self.config.directories.get(self.display_type, []):
-            self.wallpapers_all.extend(find_images(d))
-        self.wallpapers_all.sort()
+        self.wallpapers_all = {}
+        for dt, directories in self.config.directories.items():
+            self.wallpapers_all[dt] = sorted(find_wallpapers(directories))
         self.refresh_wallpapers()
 
     def refresh_wallpapers(self):
-        self.wallpapers = [w for w in self.wallpapers_all if self.valid_wallpaper(w)]
+        self.wallpapers = {}
+        for dt, wallpapers in self.wallpapers_all.items():
+            self.wallpapers[dt] = [w for w in wallpapers if self.valid_wallpaper(w)]
 
     def dump_display(self):
-        if any(self.display): self.cache[self.display_key] = self.display
-        fn = os.path.join(self.config.directory, '%s.png' % self.display_key)
+        for n, wallpaper in enumerate(self.display):
+            self.cache[self.display_key[n]] = wallpaper
+        fn = os.path.join(self.config.directory, 'wallpaper.png')
         self.display_image.save(fn)
         self.changer.set_background(fn)
         self.cache.dump()
@@ -99,43 +112,48 @@ class Wally(object): #{{{1
     def change_random(self, target=None):
         for n in range(len(self.display)):
             if target is not None and target != n: continue
-            self.display[n] = random.choice(self.wallpapers)
+            self.display[n] = random.choice(self.wallpapers[self.display_type[n]])
 
     def refresh_display(self):
         self.display_image = self.image(self.changer.get_screen_size())
         for n, monitor in enumerate(self.monitors):
-            self.set_wallpaper(self.display[n], monitor)
+            self.set_wallpaper(n, self.display[n])
         self.dump_display()
 
-    def set_wallpaper(self, wallpaper, monitor):
+    def set_wallpaper(self, n, wallpaper):
+        monitor = self.monitors[n]
         base = self.image(monitor[0:2])
         if wallpaper and os.path.isfile(wallpaper):
             self.display_image.paste(paste_scale(base, Image.open(wallpaper)), monitor[2:4])
         else:
             self.display_image.paste(base, monitor[2:4])
 
-    def increment(self, count, target=None):
+    def increment(self, n, count):
         if count == 0: return
-        total = len(self.wallpapers)
+        wallpapers = self.wallpapers[self.display_type[n]]
+        total = len(wallpapers)
+        if total == 0: return
         count %= total
         next_idx = (-1 if count > 0 else total) + count
-        for n, m in enumerate(self.monitors):
-            if target is not None and target != n: continue
-            wallpaper = self.display[n]
-            if not wallpaper:
-                wallpaper = self.wallpapers[next_idx]
-                next_idx += count / abs(count)
+        wallpaper = self.display[n]
+        if not wallpaper:
+            wallpaper = wallpapers[next_idx]
+            next_idx += count / abs(count)
+        else:
+            if wallpaper in wallpapers:
+                idx = wallpapers.index(wallpaper) + count
             else:
-                if wallpaper in self.wallpapers:
-                    idx = self.wallpapers.index(wallpaper) + count
-                else:
-                    idx = 0 if count > 0 else -1
-                if idx >= total: idx -= total
-                wallpaper = self.wallpapers[idx]
-            self.display[n] = wallpaper
+                idx = 0 if count > 0 else -1
+            if idx >= total: idx -= total
+            wallpaper = wallpapers[idx]
+        self.display[n] = wallpaper
 
     def change_next(self, target=None):
-        self.increment(1, target)
+        for n in range(len(self.display)):
+            if target is not None and target != n: continue
+            self.increment(n, 1)
 
     def change_prev(self, target=None):
-        self.increment(-1, target)
+        for n in range(len(self.display)):
+            if target is not None and target != n: continue
+            self.increment(n, -1)

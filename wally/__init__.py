@@ -10,37 +10,29 @@ configuration. Currently, Wally only supports Gnome. I would like to add
 support for KDE, but I have no need for it right now.
 
 The only assumptions that Wally makes about your collection of wallpapers is
-that they are organized into a central folder for each type of operation. The
-only operation that most people want is 'scale', which resizes the wallpaper
-while keeping the same aspect ratio. The following resizing operations are
-supported:
+that they are organized into a central folder for each type of display. The
+following display types are supported:
 
-    scale
-    multi
-    tile
-    zoom
-    center
-    stretch
+    standard
+    widescreen
+    netbook
 
 The configuration file will be created on the first invocation, and will be
 located at:
 
     ~/.wally/main.cfg
 
-You'll want to specify where to look for wallpapers. This is done with one or
-more of the following options (multiple directories are comma-separated):
+You'll want to specify where to look for wallpapers. This is done by specifying
+a list of directories for each display type. (multiple directories are
+comma-separated):
 
-    scale
-    multi
-    tile
-    zoom
-    center
-    stretch
+For example, in the [directories] section of the configuration file, you might
+have the following specified:
 
-Example:
+    standard = /usr/share/backgrounds, ~/wallpapers/standard
 
-    scale = /usr/share/backgrounds, ~/wallpapers/scale
-    multi = ~/wallpapers/multi
+For each monitor that you have, the display type will be automatically
+determined and a wallpaper from the appropriate directory will be chosen.
 
 You may not want all of your wallpapers to be considered when choosing a new
 one. You can set this with the 'exclusions' option (values are regular
@@ -74,13 +66,6 @@ Some examples of typical usage:
 
     Choose the next wallpaper for display 0 (primary):
         wally -t0 -c next
-
-    Random wallpaper for display 1 that matches the pattern 'fractal' or
-    'family photos':
-        wally -t1 -c random fractal "family photos"
-
-    Random wallpaper that matches 'family photos', but without 'Jeremy':
-        wally -c rantom 'family photos' - 'jeremy'
 
 """ #}}}
 
