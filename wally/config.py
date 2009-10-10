@@ -1,5 +1,4 @@
-import os
-import pathutils
+import os, pathutils
 from imageutils.color import hex_to_rgb, rgb_to_hex
 from scriptutils.config import SingleConfig
 
@@ -8,7 +7,7 @@ from . import __appname__
 class Config(SingleConfig):
 
     def __init__(self):
-        SingleConfig.__init__(self,
+        super(Config, self).__init__(
                 filename=os.path.join(
                     os.path.expanduser('~/.%s' % __appname__.lower()),
                     'main.cfg'

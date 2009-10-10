@@ -1,9 +1,9 @@
 import os, re, random
-import gnomeutils
 from scriptutils.cache import Cache
 from imageutils import find_images
 from imageutils.size import aspect_ratio
 from imageutils.compose import paste_scale
+from gnomeutils import Background()
 from PIL import Image
 
 from .config import Config
@@ -27,7 +27,7 @@ def display_type(monitor): #{{{2
 class Wally(object): #{{{2
 
     def __init__(self):
-        self.changer = gnomeutils.Background()
+        self.changer = Background()
         self.monitors = self.changer.get_monitors()
         self.config = Config()
         self.cache = Cache(os.path.join(self.config.directory, 'cache'))

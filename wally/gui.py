@@ -6,7 +6,7 @@ from imageutils.color import rgb8_to_rgb16, rgb16_to_rgb8
 from pathutils import condense
 from gnomeutils import Thumbnails
 from gtkutils import pixbuf_from_file, get_icon_list
-from gtkutils import StandardDialog, DirectoryChooser
+from gtkutils import AboutDialog, StandardDialog, DirectoryChooser
 from gtkutils.treeview import text_column
 
 from .main import Wally
@@ -30,28 +30,12 @@ def main(): #{{{2
 
 # CLASSES {{{1
 
-class AboutDialog(gtk.AboutDialog): #{{{2
-
-    def __init__(self, *args, **kwargs):
-        gtk.AboutDialog.__init__(self, *args, **kwargs)
-        self.set_name(__appname__)
-        self.set_authors([__author__])
-        self.set_website(__url__)
-        self.set_license(__license__)
-        self.set_logo(pixbuf_from_file(get_icon('logo.svg'), (100, 100)))
-
-    def run(self):
-        gtk.AboutDialog.run(self)
-        self.hide()
-
-
-
 class ExclusionsDialog(StandardDialog): #{{{2
 
     COL_EX = 0
 
-    def __init__(self, exclusions, *args, **kwargs):
-        super(ExclusionsDialog, self).__init__(*args, **kwargs)
+    def __init__(self, exclusions, **kwargs):
+        super(ExclusionsDialog, self).__init__(**kwargs)
         self.set_title('Exclusions')
         self.set_default_size(400, 300)
         self.treeview = gtk.TreeView(gtk.ListStore(str))
@@ -113,11 +97,11 @@ class ExclusionsDialog(StandardDialog): #{{{2
 class BackgroundColorDialog(gtk.ColorSelectionDialog): #{{{2
 
     def __init__(self, color):
-        gtk.ColorSelectionDialog.__init__(self, title='Background Color')
+        super(BackgroundColorDialog, self).__init__(title='Background Color')
         self.colorsel.set_current_color(color)
 
     def run(self):
-        r = gtk.ColorSelectionDialog.run(self)
+        r = super(BackgroundColorDialog, self).run()
         if r != gtk.RESPONSE_OK:
             color = None
         else:
@@ -129,8 +113,8 @@ class BackgroundColorDialog(gtk.ColorSelectionDialog): #{{{2
 
 class DirectoriesDialog(StandardDialog): #{{{2
 
-    def __init__(self, directories, *args, **kwargs):
-        super(DirectoriesDialog, self).__init__(*args, **kwargs)
+    def __init__(self, directories, **kwargs):
+        super(DirectoriesDialog, self).__init__(**kwargs)
         self.set_title('Directories')
         self.notebook = gtk.Notebook()
         self.vbox.add(self.notebook)
@@ -161,7 +145,7 @@ class DirectoriesPage(gtk.Frame): #{{{2
     COL_DIR = 0
 
     def __init__(self, directories):
-        gtk.Frame.__init__(self)
+        super(DirectoriesPage, self).__init__()
         self.treeview = gtk.TreeView(gtk.ListStore(str))
         self.treeview.set_headers_visible(False)
         self.treeview.append_column(text_column('Directory', self.COL_DIR))
@@ -214,8 +198,8 @@ class WallpaperIconView(gtk.IconView): #{{{2
 
     COL_TYPE, COL_FILE, COL_PIX = range(3)
 
-    def __init__(self, app, *args, **kwargs):
-        gtk.IconView.__init__(self, *args, **kwargs)
+    def __init__(self, app, **kwargs):
+        super(WallpaperIconView, self).__init__(**kwargs)
         self.app = app
         self.set_model(gtk.ListStore(int, str, gtk.gdk.Pixbuf))
         self.set_pixbuf_column(self.COL_PIX)
@@ -242,7 +226,7 @@ class WallpaperIconView(gtk.IconView): #{{{2
 class MainWindow(gtk.Window): #{{{2
 
     def __init__(self, app):
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.set_icon_list(*get_icon_list(get_icon('logo.svg')))
         self.set_default_size(600, 500)
         self.app = app
@@ -425,7 +409,13 @@ class MainWindow(gtk.Window): #{{{2
         self.app.wally.config.write()
 
     def on_about_menuitem_activate(self, widget): #{{{4
-        AboutDialog().run()
+        AboutDialog(
+                name=__appname__,
+                authors=[__author__],
+                website=__url__,
+                license=__license__,
+                logo=get_icon('logo.svg'),
+                ).run()
 
     def on_search_button_clicked(self, widget): #{{{4
         self.refresh_wallpapers(self.search_entry.get_text())
