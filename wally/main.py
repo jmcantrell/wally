@@ -3,7 +3,7 @@ from scriptutils.cache import Cache
 from imageutils import find_images
 from imageutils.size import aspect_ratio
 from imageutils.compose import paste_scale
-from gnomeutils import Background()
+from gnomeutils import Background
 from PIL import Image
 
 from .config import Config
