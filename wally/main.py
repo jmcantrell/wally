@@ -112,7 +112,9 @@ class Wally(object): #{{{2
     def change_random(self, target=None):
         for n in range(len(self.display)):
             if target is not None and target != n: continue
-            self.display[n] = random.choice(self.wallpapers[self.display_type[n]])
+            wallpapers = self.wallpapers[self.display_type[n]]
+            if not len(wallpapers): continue
+            self.display[n] = random.choice(wallpapers)
 
     def refresh_display(self):
         self.display_image = self.image(self.changer.get_screen_size())
