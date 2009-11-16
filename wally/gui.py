@@ -1,36 +1,35 @@
 import os.path
 import gtk, pygtk; pygtk.require('2.0')
+
 from pkg_resources import Requirement, resource_filename
 
 from imageutils.color import rgb8_to_rgb16, rgb16_to_rgb8
 from pathutils import condense
 from gnomeutils import Thumbnails
-from gtkutils import pixbuf_from_file, get_icon_list
+from gtkutils import get_icon_list
 from gtkutils import AboutDialog, StandardDialog, DirectoryChooser
-from gtkutils.treeview import text_column
+from gtkutils.treeview import column_text
 
 from .main import Wally
 from . import WALLPAPER_TYPES
 from . import __appname__, __author__, __url__, __license__
 
-# FUNCTIONS {{{1
-
-def get_resource(name): #{{{2
+def get_resource(name): #{{{1
     return resource_filename(
             Requirement.parse(__appname__),
             os.path.join(__appname__.lower(), name)
             )
 
-def get_icon(name): #{{{2
+def get_icon(name): #{{{1
     return get_resource(os.path.join('icons', name))
 
-def main(): #{{{2
+def main(): #{{{1
     w = WallyGTK()
     gtk.main()
 
-# CLASSES {{{1
+#}}}1
 
-class ExclusionsDialog(StandardDialog): #{{{2
+class ExclusionsDialog(StandardDialog): #{{{1
 
     COL_EX = 0
 
@@ -40,7 +39,7 @@ class ExclusionsDialog(StandardDialog): #{{{2
         self.set_default_size(400, 300)
         self.treeview = gtk.TreeView(gtk.ListStore(str))
         self.treeview.set_headers_visible(False)
-        self.treeview.append_column(text_column('Exclusion', self.COL_EX))
+        self.treeview.append_column(column_text('Exclusion', self.COL_EX))
         self.treeview.connect('cursor-changed', self.on_treeview_cursor_changed)
         scrolled = gtk.ScrolledWindow()
         scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -94,7 +93,7 @@ class ExclusionsDialog(StandardDialog): #{{{2
 
 
 
-class BackgroundColorDialog(gtk.ColorSelectionDialog): #{{{2
+class BackgroundColorDialog(gtk.ColorSelectionDialog): #{{{1
 
     def __init__(self, color):
         super(BackgroundColorDialog, self).__init__(title='Background Color')
@@ -111,7 +110,7 @@ class BackgroundColorDialog(gtk.ColorSelectionDialog): #{{{2
 
 
 
-class DirectoriesDialog(StandardDialog): #{{{2
+class DirectoriesDialog(StandardDialog): #{{{1
 
     def __init__(self, directories, **kwargs):
         super(DirectoriesDialog, self).__init__(**kwargs)
@@ -140,7 +139,7 @@ class DirectoriesDialog(StandardDialog): #{{{2
 
 
 
-class DirectoriesPage(gtk.Frame): #{{{2
+class DirectoriesPage(gtk.Frame): #{{{1
 
     COL_DIR = 0
 
@@ -148,7 +147,7 @@ class DirectoriesPage(gtk.Frame): #{{{2
         super(DirectoriesPage, self).__init__()
         self.treeview = gtk.TreeView(gtk.ListStore(str))
         self.treeview.set_headers_visible(False)
-        self.treeview.append_column(text_column('Directory', self.COL_DIR))
+        self.treeview.append_column(column_text('Directory', self.COL_DIR))
         self.treeview.connect('cursor-changed', self.on_treeview_cursor_changed)
         scrolled = gtk.ScrolledWindow()
         scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -194,7 +193,7 @@ class DirectoriesPage(gtk.Frame): #{{{2
         self.remove_button.set_sensitive(True)
 
 
-class WallpaperIconView(gtk.IconView): #{{{2
+class WallpaperIconView(gtk.IconView): #{{{1
 
     COL_TYPE, COL_FILE, COL_PIX = range(3)
 
@@ -223,7 +222,7 @@ class WallpaperIconView(gtk.IconView): #{{{2
 
 
 
-class MainWindow(gtk.Window): #{{{2
+class MainWindow(gtk.Window): #{{{1
 
     def __init__(self, app):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
@@ -430,7 +429,7 @@ class MainWindow(gtk.Window): #{{{2
 
 
 
-class WallyGTK(object): #{{{2
+class WallyGTK(object): #{{{1
 
     def __init__(self):
         self.wally = Wally()

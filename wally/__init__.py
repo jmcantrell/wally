@@ -1,4 +1,4 @@
-# Description {{{1
+# DOCUMENTATION {{{1
 
 """Tool for managing desktop wallpapers.
 
@@ -22,9 +22,9 @@ located at:
 
     ~/.wally/main.cfg
 
-You'll want to specify where to look for wallpapers. This is done by specifying
-a list of directories for each display type. (multiple directories are
-comma-separated):
+You'll want to specify where to look for wallpapers. This is done by
+specifying a list of directories for each display type. (multiple directories
+are comma-separated):
 
 For example, in the [directories] section of the configuration file, you might
 have the following specified:

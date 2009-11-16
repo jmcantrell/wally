@@ -1,4 +1,4 @@
-import os, hashlib
+import hashlib
 
 def matches_any(x, patterns): #{{{1
     """Test whether 'x' matches any pattern in 'patterns'"""

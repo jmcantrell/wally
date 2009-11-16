@@ -4,14 +4,11 @@ from scriptutils.config import SingleConfig
 
 from . import __appname__
 
-class Config(SingleConfig):
+class Config(SingleConfig): #{{{1
 
     def __init__(self):
         super(Config, self).__init__(
-                filename=os.path.join(
-                    os.path.expanduser('~/.%s' % __appname__.lower()),
-                    'main.cfg'
-                    ),
+                filename=os.path.join(os.path.expanduser('~/.%s' % __appname__.lower()), 'main.cfg'),
                 base={
                     'app:main': {
                         'background_color': '#000000',

@@ -10,21 +10,18 @@ from .config import Config
 from .utils import matches_any, matches_all
 from . import ASPECT_RATIOS
 
-# FUNCTIONS {{{1
-
-def find_wallpapers(directories): #{{{2
+def find_wallpapers(directories): #{{{1
     wallpapers = []
     for d in directories:
         wallpapers.extend(find_images(d))
     return wallpapers
 
-def display_type(monitor): #{{{2
+def display_type(monitor): #{{{1
     return ASPECT_RATIOS.get(aspect_ratio(monitor[0:2]), 'standard')
 
+#}}}1
 
-# CLASSES {{{1
-
-class Wally(object): #{{{2
+class Wally(object): #{{{1
 
     def __init__(self):
         self.changer = Background()
