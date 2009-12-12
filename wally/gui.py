@@ -7,7 +7,7 @@ from imageutils.color import rgb8_to_rgb16, rgb16_to_rgb8
 from pathutils import condense
 from gnomeutils import Thumbnails
 from gtkutils import get_icon_list
-from gtkutils import AboutDialog, StandardDialog, DirectoryChooser
+from gtkutils import AboutDialog, StandardDialog, DirectoryChooserDialog
 from gtkutils.treeview import column_text
 
 from .main import Wally
@@ -179,7 +179,7 @@ class DirectoriesPage(gtk.Frame): #{{{1
         return [os.path.expanduser(row[self.COL_DIR]) for row in model]
 
     def on_add_button_clicked(self, widget):
-        directory = DirectoryChooser().run()
+        directory = DirectoryChooserDialog().run()
         if not directory: return
         self.add_directory(directory)
 
