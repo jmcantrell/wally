@@ -57,16 +57,24 @@ following command at the command line:
 
     wally --help
 
-Some examples of typical usage:
+Examples of Usage
+-----------------
 
-    See the current status:
-        wally -v
+See the current status:
 
-    Choose a wallpaper at random from all sources:
-        wally -c random
+    wally -v
 
-    Choose the next wallpaper for display 0 (primary):
-        wally -t0 -c next
+Choose a wallpaper at random from all sources:
+
+    wally -c random
+
+Choose the next wallpaper for display 0 (primary):
+
+    wally -t0 -c next
+
+Choose a random wallpaper matching the regular expression "narwhal":
+
+    wally -c random -s "narwhal"
 
 Installation
 ------------
