@@ -85,3 +85,17 @@ Otherwise, you'll have to download the package and run:
 
 If you install it this way then you will also have to install all necessary
 dependencies manually.
+
+Scheduling Wallpaper Changes
+----------------------------
+
+One of the first things you may want to do is schedule Wally to change the
+wallpaper periodically. I recommend using gnome-schedule, as it's easiest to
+setup. Simply put the following in the command field:
+
+    /path/to/wally -c random
+
+Change the behavior to "X application". This will ensure that the scheduler is
+aware of the display that will be updated.
+
+Set your desired frequency of execution and you're done.
