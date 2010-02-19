@@ -30,7 +30,7 @@ class Config(SingleConfig): #{{{1
     def _get_directories(self):
         dirs = {}
         for wt in self.options('directories'):
-            dirs[wt] = [pathutils.expand(d) for d in self.getlist('directories', wt, [])]
+            dirs[wt] = [pathutils.expand(d.encode('utf-8')) for d in self.getlist('directories', wt, [])]
         return dirs
 
     def _set_directories(self, directories):
