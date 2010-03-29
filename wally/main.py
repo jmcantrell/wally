@@ -1,4 +1,4 @@
-import os, re, random
+import os, re, random, socket
 from scriptutils.cache import Cache
 from imageutils import find_images
 from imageutils.size import aspect_ratio
@@ -93,7 +93,8 @@ class Wally(object): #{{{1
     def dump_display(self):
         for n, wallpaper in enumerate(self.display):
             self.cache[self.display_key[n]] = wallpaper
-        fn = os.path.join(self.config.directory, 'wallpaper.png')
+        wn = 'wallpaper-%s.png' % socket.gethostname()
+        fn = os.path.join(self.config.directory, wn)
         self.display_image.save(fn)
         self.changer.set_background(fn)
         self.cache.dump()
