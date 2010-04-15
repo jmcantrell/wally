@@ -1,4 +1,5 @@
 import os, re, random, socket
+
 from scriptutils.cache import Cache
 from imageutils import find_images
 from imageutils.size import aspect_ratio
@@ -8,6 +9,7 @@ from PIL import Image
 
 from .config import Config
 from .utils import matches_any, matches_all
+
 from . import ASPECT_RATIOS
 
 def find_wallpapers(directories): #{{{1
@@ -18,6 +20,15 @@ def find_wallpapers(directories): #{{{1
 
 def display_type(monitor): #{{{1
     return ASPECT_RATIOS.get(aspect_ratio(monitor[0:2]), 'standard')
+
+def main(opts, args): #{{{1
+    w = Wally()
+    if opts.search: w.searches = opts.search
+    if opts.exclude: w.exclusions = opts.exclude
+    w.refresh_wallpapers()
+    if opts.command: getattr(w, 'change_%s' % opts.command)(opts.target)
+    if opts.verbose: print '\n'.join(w.display)
+    if opts.command or opts.refresh: w.refresh_display()
 
 #}}}1
 

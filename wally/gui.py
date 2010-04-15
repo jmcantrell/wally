@@ -10,7 +10,7 @@ from gtkutils import get_icon_list
 from gtkutils import AboutDialog, StandardDialog, DirectoryChooserDialog
 from gtkutils.treeview import column_text
 
-from .main import Wally
+from . import Wally
 from . import WALLPAPER_TYPES
 from . import __appname__, __author__, __url__, __license__
 
@@ -23,7 +23,7 @@ def get_resource(name): #{{{1
 def get_icon(name): #{{{1
     return get_resource(os.path.join('icons', name))
 
-def main(): #{{{1
+def main(opts, args): #{{{1
     w = WallyGTK()
     gtk.main()
 

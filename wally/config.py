@@ -4,7 +4,7 @@ from scriptutils.config import SingleConfig
 
 from . import __appname__
 
-class Config(SingleConfig): #{{{1
+class Config(SingleConfig):
 
     def __init__(self):
         super(Config, self).__init__(

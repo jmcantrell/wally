@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
         name='Wally',
-        version='0.6.11',
+        version='0.6.12',
         description='Tool for managing desktop backgrounds.',
         author='Jeremy Cantrell',
         author_email='jmcantrell@gmail.com',
@@ -27,10 +27,7 @@ setup(
             ],
         entry_points={
             'console_scripts': [
-                'wally=wally.console:main',
-                ],
-            'gui_scripts': [
-                'wally-gui=wally.gui:main',
+                'wally=wally.__main__:main',
                 ],
             },
         packages=[
