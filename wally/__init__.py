@@ -1,8 +1,8 @@
 __appname__ = 'Wally'
 __author__  = 'Jeremy Cantrell <jmcantrell@gmail.com>'
 __url__     = 'http://jmcantrell.me'
-__date__    = 'Wed 2010-04-14 23:11:14 (-0400)'
-__license__ = 'GPL'
+__date__    = 'Fri 2010-04-23 13:09:51 (-0400)'
+__license__ = 'BSD'
 
 import os, re, random, socket
 

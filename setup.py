@@ -12,7 +12,7 @@ setup(
             'Development Status :: 4 - Beta',
             'Environment :: X11 Applications :: Gnome',
             'Intended Audience :: End Users/Desktop',
-            'License :: OSI Approved :: GNU General Public License (GPL)',
+            'License :: OSI Approved :: BSD License',
             'Natural Language :: English',
             'Operating System :: POSIX :: Linux',
             'Programming Language :: Python',
