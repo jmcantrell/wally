@@ -1,1 +1,3 @@
+include setup.py
+
 recursive-include wally/icons *.svg
