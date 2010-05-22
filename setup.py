@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
         name='Wally',
-        version='0.6.12',
+        version='0.6.13',
         description='Tool for managing desktop backgrounds.',
         author='Jeremy Cantrell',
         author_email='jmcantrell@gmail.com',
