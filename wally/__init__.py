@@ -1,7 +1,7 @@
 __appname__ = 'Wally'
 __author__  = 'Jeremy Cantrell <jmcantrell@gmail.com>'
 __url__     = 'http://jmcantrell.me'
-__date__    = 'Fri 2010-04-23 13:09:51 (-0400)'
+__date__    = 'Sun 2010-05-23 22:42:42 (-0400)'
 __license__ = 'BSD'
 
 import os, re, random, socket
@@ -20,6 +20,8 @@ ASPECT_RATIOS = {
         (128, 75): 'netbook',
         (4, 3): 'standard',
         (8, 5): 'widescreen',
+        (16, 9): 'widescreen',
+        (683, 384): 'widescreen',
         }
 
 WALLPAPER_TYPES = uniqify(ASPECT_RATIOS.values())
