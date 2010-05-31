@@ -1,4 +1,16 @@
 import hashlib
+from imageutils import find_images
+from imageutils.size import aspect_ratio
+
+from . import ASPECT_RATIOS
+
+def display_type(monitor): #{{{1
+    return ASPECT_RATIOS.get(aspect_ratio(monitor[0:2]), 'standard')
+
+def find_wallpapers(directories): #{{{1
+    for d in directories:
+        for i in find_images(d):
+            yield i
 
 def matches_any(x, patterns): #{{{1
     """Test whether 'x' matches any pattern in 'patterns'"""

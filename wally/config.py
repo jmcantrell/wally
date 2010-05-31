@@ -15,7 +15,9 @@ class Config(SingleConfig):
                         'exclusions': [],
                         },
                     'directories': {
-                        'standard': ['/usr/share/backgrounds'],
+                        'netbook':    ['/usr/share/backgrounds'],
+                        'standard':   ['/usr/share/backgrounds'],
+                        'widescreen': ['/usr/share/backgrounds'],
                         },
                     })
 

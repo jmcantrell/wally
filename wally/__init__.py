@@ -1,43 +1,30 @@
 __appname__ = 'Wally'
 __author__  = 'Jeremy Cantrell <jmcantrell@gmail.com>'
 __url__     = 'http://jmcantrell.me'
-__date__    = 'Sun 2010-05-23 22:42:42 (-0400)'
+__date__    = 'Sun 2010-05-30 22:27:12 (-0400)'
 __license__ = 'BSD'
 
 import os, re, random, socket
 
 from scriptutils.cache import Cache
-from imageutils import find_images
-from imageutils.size import aspect_ratio
 from imageutils.compose import paste_scale
 from gnomeutils import Background
 from PIL import Image
 
 from .config import Config
-from .utils import matches_any, matches_all, uniqify
 
 ASPECT_RATIOS = {
-        (128, 75): 'netbook',
-        (4, 3): 'standard',
-        (8, 5): 'widescreen',
-        (16, 9): 'widescreen',
+        (  4,   3): 'standard',
+        (  8,   5): 'widescreen',
+        ( 16,   9): 'widescreen',
+        (128,  75): 'netbook',
         (683, 384): 'widescreen',
         }
 
+from .utils import uniqify, display_type, find_wallpapers, matches_any, matches_all
+
 WALLPAPER_TYPES = uniqify(ASPECT_RATIOS.values())
-
 WALLPAPER_COMMANDS = ['random', 'next', 'prev']
-
-def find_wallpapers(directories): #{{{1
-    wallpapers = []
-    for d in directories:
-        wallpapers.extend(find_images(d))
-    return wallpapers
-
-def display_type(monitor): #{{{1
-    return ASPECT_RATIOS.get(aspect_ratio(monitor[0:2]), 'standard')
-
-#}}}1
 
 class Wally(object): #{{{1
 
@@ -128,8 +115,8 @@ class Wally(object): #{{{1
     def change_random(self, target=None):
         for n in range(len(self.display)):
             if target is not None and target != n: continue
-            wallpapers = self.wallpapers[self.display_type[n]]
-            if not len(wallpapers): continue
+            wallpapers = self.wallpapers.get(self.display_type[n])
+            if not wallpapers: continue
             self.display[n] = random.choice(wallpapers)
 
     def refresh_display(self):
@@ -148,7 +135,8 @@ class Wally(object): #{{{1
 
     def increment(self, n, count):
         if count == 0: return
-        wallpapers = self.wallpapers[self.display_type[n]]
+        wallpapers = self.wallpapers.get(self.display_type[n])
+        if not wallpapers: return
         total = len(wallpapers)
         if total == 0: return
         count %= total
