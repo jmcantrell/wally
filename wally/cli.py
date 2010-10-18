@@ -1,6 +1,6 @@
 from . import Wally
 
-def main(opts, args):
+def main(opts):
     w = Wally()
     if opts.search: w.searches = opts.search
     if opts.exclude: w.exclusions = opts.exclude

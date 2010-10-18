@@ -1,4 +1,4 @@
-from scriptutils.options import Options
+from argparse import ArgumentParser
 
 from .cli import main as main_cli
 from .gui import main as main_gui
@@ -6,17 +6,17 @@ from .gui import main as main_gui
 from . import WALLPAPER_COMMANDS
 
 def get_options(): #{{{1
-    opts = Options()
-    opts.add_option('-v', '--verbose', default=False, action='store_true', help='Be verbose.')
-    opts.add_option('-t', '--target', default=None, type='int', help='Restrict to specific monitor.')
-    opts.add_option('-c', '--command', default=None, type='choice', choices=WALLPAPER_COMMANDS, help='Command to change wallpaper.')
-    opts.add_option('-r', '--refresh', default=False, action='store_true', help='Refresh the display.')
-    opts.add_option('-s', '--search', metavar='REGEX', action='append', help='Search filenames based on REGEX.')
-    opts.add_option('-x', '--exclude', metavar='REGEX', action='append', help='Exclude filenames based on REGEX.')
-    opts.add_option('-g', '--gui', default=False, action='store_true', help='Use gui mode.')
+    opts = ArgumentParser(description="Tool for managing desktop backgrounds.")
+    opts.add_argument('-v', '--verbose', default=False, action='store_true', help='be verbose')
+    opts.add_argument('-t', '--target', default=None, type='int', help='restrict to specific monitor')
+    opts.add_argument('-c', '--command', default=None, type='choice', choices=WALLPAPER_COMMANDS, help='command to change wallpaper')
+    opts.add_argument('-r', '--refresh', default=False, action='store_true', help='refresh the display')
+    opts.add_argument('-s', '--search', metavar='REGEX', action='append', help='search filenames based on REGEX')
+    opts.add_argument('-x', '--exclude', metavar='REGEX', action='append', help='exclude filenames based on REGEX')
+    opts.add_argument('-g', '--gui', default=False, action='store_true', help='use gui mode')
     return opts.parse_args()
 
 def main(): #{{{1
-    opts, args = get_options()
+    opts = get_options()
     m = main_gui if opts.gui else main_cli
-    m(opts, args)
+    m(opts)

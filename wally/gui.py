@@ -23,7 +23,7 @@ def get_resource(name): #{{{1
 def get_icon(name): #{{{1
     return get_resource(os.path.join('icons', name))
 
-def main(opts, args): #{{{1
+def main(opts): #{{{1
     w = WallyGTK()
     gtk.main()
 
