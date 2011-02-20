@@ -10,7 +10,7 @@ def display_type(monitor): #{{{1
 def find_wallpapers(directories): #{{{1
     for d in directories:
         for i in find_images(d):
-            yield i
+            yield i.filename
 
 def matches_any(x, patterns): #{{{1
     """Test whether 'x' matches any pattern in 'patterns'"""
