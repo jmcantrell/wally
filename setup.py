@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
 
     name='wally',
-    version='0.7.3',
+    version='0.7.4',
 
     description='Tool for managing desktop backgrounds.',
 
